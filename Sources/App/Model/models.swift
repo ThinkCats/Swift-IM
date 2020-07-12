@@ -38,18 +38,18 @@ final class User: Model {
     var name: String
     @Field(key: "avatar")
     var avatar: String?
-    @Field(key: "onlineStatus")
-    var onlineStatus: Int
+    @Field(key: "online")
+    var online: Bool?
     @Field(key: "conn")
-    var conn: String
+    var conn: String?
 
     init() {}
 
-    init(id: UUID? = nil, name: String, avatar: String? = nil, onlineStatus: Int, conn: String) {
+    init(id: UUID? = nil, name: String, avatar: String? = nil, online: Bool?=false, conn: String?=nil) {
         self.id = id
         self.name = name
         self.avatar = avatar
-        self.onlineStatus = onlineStatus
+        self.online = online
         self.conn = conn
     }
 }
@@ -90,17 +90,22 @@ final class GroupUserRel: Model {
     var group: Group
     @Field(key: "user_remark_name")
     var userRemarkName: String?
-    @Parent(key: "last_msg_id")
-    var message: Message
+    @Field(key: "last_msg_id")
+    
+    //The lastMsgId maybe a offset if the user lost msg
+    var lastMsgId: UUID?
+    @Field(key: "owner")
+    var owner:Bool
 
     init() {}
 
-    init(id: UUID? = nil, userId: UUID, groupId: UUID, userRemarkName: String? = nil, lastMsgId: UUID) {
+    init(id: UUID? = nil, userId: UUID, groupId: UUID, userRemarkName: String? = nil, lastMsgId: UUID?=nil, owner:Bool) {
         self.id = id
         self.$user.id = userId
         self.$group.id = groupId
         self.userRemarkName = userRemarkName
-        self.$message.id = lastMsgId
+        self.lastMsgId = lastMsgId
+        self.owner=owner
     }
 }
 

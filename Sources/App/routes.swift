@@ -5,6 +5,8 @@ func routes(_ app: Application) throws {
     testRoute(app: app)
     // route group
     try app.register(collection: GroupController())
+    // route user
+    try app.register(collection: UserController())
     // route ws
     routeWs(app: app)
     
