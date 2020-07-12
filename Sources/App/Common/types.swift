@@ -23,3 +23,11 @@ enum MessageSentStatus {
     case Sent
 }
 
+enum MessageEvent {
+    case Login
+    case Keep
+    case Msg
+    case Ack
+    case Logout
+}
+

@@ -14,12 +14,16 @@ public func routeWs(app: Application) {
 
 func handleWs(req: Request, ws: WebSocket) {
     logger.info("Connect Echo:\(ws), Ws Size:\(MemoryLayout.size(ofValue: ws)),Request Header:\(req.headers) ")
-    
+
+    guard let loginUid = req.headers.first(name: "userId") else {
+        ws.send("Not Login")
+               return
+    }
+  
     // Send Greeting
     ws.send("Welcome!")
-    
     // Local Cache Connection
-    cacheWs(uid: "TODO", ws: ws)
+    cacheWs(uid: loginUid, ws: ws)
     
     // Message
     ws.onText { _, string in
@@ -48,7 +52,7 @@ func handleWs(req: Request, ws: WebSocket) {
     // Close
     ws.onClose.whenComplete { _ in
         logger.info("Close Ws, Remove From Cache")
-        removeCacheWs(uid: "TODO")
+        removeCacheWs(uid: loginUid)
     }
 }
 
