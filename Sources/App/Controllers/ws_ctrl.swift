@@ -6,25 +6,34 @@
 //
 import Vapor
 
-var wsConnCache = [WebSocket]()
+var wsLocalConnCache = [String: WebSocket]()
 
 public func routeWs(app: Application) {
     app.webSocket("echo", onUpgrade: handleWs)
 }
 
 func handleWs(req: Request, ws: WebSocket) {
-    logger.info("Connect Echo:\(ws), Ws Size:\(MemoryLayout.size(ofValue: ws)) ")
+    logger.info("Connect Echo:\(ws), Ws Size:\(MemoryLayout.size(ofValue: ws)),Request Header:\(req.headers) ")
     
-    let hasCached = wsConnCache.contains { (cachedWs: WebSocket) in
-        cachedWs === ws
-    }
-    if !hasCached {
-        wsConnCache.append(ws)
-    } else {
-        logger.info("Cached This Ws Already,Skip")
-    }
+    // Send Greeting
+    ws.send("Welcome!")
     
-    ws.send("Connect to WS :\(ws)")
+    // Local Cache Connection
+    cacheWs(uid: "TODO", ws: ws)
+    
+    // Message
+    ws.onText { _, string in
+        logger.info("Cache Ws:\(wsLocalConnCache)")
+        logger.info("--- Reply:\(string)")
+        
+        // Group Reply
+        for (_,tmpWs) in wsLocalConnCache {
+            tmpWs.send("GROUP REPLY:\(string)")
+        }
+    
+        // Single Reply
+        // ws.send("Reply:\(string)")
+    }
     
     // Ping
     ws.onPing { _ in
@@ -36,27 +45,28 @@ func handleWs(req: Request, ws: WebSocket) {
         logger.info("Pong")
     }
     
-    // Message
-    ws.onText { _, string in
-        logger.info("Cache Ws:\(wsConnCache)")
-        logger.info("--- Reply:\(string)")
-        
-        // Group Reply
-        for wss in wsConnCache {
-            wss.send("GROUP REPLY:\(string)")
-        }
-        
-        // Single Reply
-        // ws.send("Reply:\(string)")
-    }
-    
     // Close
     ws.onClose.whenComplete { _ in
         logger.info("Close Ws, Remove From Cache")
-        for (index, value) in wsConnCache.enumerated() {
-            if value === ws {
-                wsConnCache.remove(at: index)
-            }
-        }
+        removeCacheWs(uid: "TODO")
     }
+}
+
+func cacheWs(uid:String,ws:WebSocket) {
+    let hasCached = wsLocalConnCache.contains { (cachedUid:String, cachedWs: WebSocket) in
+        uid == cachedUid
+    }
+    if !hasCached {
+        wsLocalConnCache.updateValue(ws, forKey: uid)
+    } else {
+        logger.info("Cached This Ws Already,Skip")
+    }
+}
+
+func removeCacheWs(uid:String) {
+    wsLocalConnCache.forEach({ key,value in
+        if key == uid {
+            wsLocalConnCache.removeValue(forKey: uid)
+        }
+    })
 }

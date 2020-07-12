@@ -22,3 +22,4 @@ enum MessageSentStatus {
     case Waiting
     case Sent
 }
+
