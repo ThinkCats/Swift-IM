@@ -1,6 +1,6 @@
 //
 //  File.swift
-//  
+//
 //
 //  Created by wanglei on 2020/7/12.
 //
@@ -31,3 +31,11 @@ enum MessageEvent {
     case Logout
 }
 
+struct IMessage {
+    var groupId:String?
+    var from:String
+    var event: MessageEvent
+    var type: MessageType
+    var category: MessageCategoy
+    var body: String
+}

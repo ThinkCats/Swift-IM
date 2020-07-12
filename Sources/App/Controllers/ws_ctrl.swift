@@ -6,20 +6,21 @@
 //
 import Vapor
 
-var wsLocalConnCache = [String: WebSocket]()
-
 public func routeWs(app: Application) {
     app.webSocket("echo", onUpgrade: handleWs)
 }
 
 func handleWs(req: Request, ws: WebSocket) {
     logger.info("Connect Echo:\(ws), Ws Size:\(MemoryLayout.size(ofValue: ws)),Request Header:\(req.headers) ")
-
-    guard let loginUid = req.headers.first(name: "userId") else {
+    
+    guard let loginUid = req.headers.first(name: "Sec-WebSocket-Protocol") else {
+        logger.info("Not Login")
         ws.send("Not Login")
-               return
+        return
     }
-  
+    
+    logger.info("Auth Ok:\(loginUid)")
+    
     // Send Greeting
     ws.send("Welcome!")
     // Local Cache Connection
@@ -28,13 +29,12 @@ func handleWs(req: Request, ws: WebSocket) {
     // Message
     ws.onText { _, string in
         logger.info("Cache Ws:\(wsLocalConnCache)")
-        logger.info("--- Reply:\(string)")
         
         // Group Reply
-        for (_,tmpWs) in wsLocalConnCache {
+        for (_, tmpWs) in wsLocalConnCache {
             tmpWs.send("GROUP REPLY:\(string)")
         }
-    
+        
         // Single Reply
         // ws.send("Reply:\(string)")
     }
@@ -56,21 +56,6 @@ func handleWs(req: Request, ws: WebSocket) {
     }
 }
 
-func cacheWs(uid:String,ws:WebSocket) {
-    let hasCached = wsLocalConnCache.contains { (cachedUid:String, cachedWs: WebSocket) in
-        uid == cachedUid
-    }
-    if !hasCached {
-        wsLocalConnCache.updateValue(ws, forKey: uid)
-    } else {
-        logger.info("Cached This Ws Already,Skip")
-    }
-}
-
-func removeCacheWs(uid:String) {
-    wsLocalConnCache.forEach({ key,value in
-        if key == uid {
-            wsLocalConnCache.removeValue(forKey: uid)
-        }
-    })
+func handleMsg(msg:String) {
+    
 }
