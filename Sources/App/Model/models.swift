@@ -114,12 +114,12 @@ final class MessageStatus: Model {
 
     @ID(key: .id)
     var id: UUID?
-    @Parent(key: "msg_id")
-    var message: Message
-    @Parent(key: "receiver_uid")
-    var user: User
-    @Parent(key: "group_id")
-    var group: Group
+    @Field(key: "msg_id")
+    var msgId: UUID
+    @Field(key: "receiver_uid")
+    var revUid: UUID
+    @Field(key: "group_id")
+    var groupId: UUID
     @Field(key: "send_status")
     var sendStatus:Int
     @Field(key: "read_status")
@@ -129,9 +129,9 @@ final class MessageStatus: Model {
 
     init(id: UUID? = nil, msgId: UUID, receiverUid: UUID, groupId: UUID, sendStatus: Int, readStatus: Int) {
         self.id = id
-        self.$message.id = msgId
-        self.$user.id = receiverUid
-        self.$group.id = groupId
+        self.msgId = msgId
+        self.revUid = receiverUid
+        self.groupId = groupId
         self.sendStatus = sendStatus
         self.readStatus = readStatus
     }

@@ -7,4 +7,5 @@
 
 enum BizError: Error {
     case SlackOfParams
+    case UnknownMsgEvent
 }

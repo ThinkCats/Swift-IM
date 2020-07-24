@@ -5,7 +5,7 @@
 //  Created by wanglei on 2020/7/12.
 //
 
-enum MessageType {
+enum MessageType:String,Codable {
     case Text
     case Audio
     case Vedio
@@ -13,17 +13,17 @@ enum MessageType {
     case RichText
 }
 
-enum MessageCategoy {
+enum MessageCategoy:String,Codable {
     case Normal
     case Scheduled
 }
 
-enum MessageSentStatus {
+enum MessageSentStatus:String,Codable {
     case Waiting
     case Sent
 }
 
-enum MessageEvent {
+enum MessageEvent:String,Codable {
     case Login
     case Keep
     case Msg
@@ -31,11 +31,16 @@ enum MessageEvent {
     case Logout
 }
 
-struct IMessage {
-    var groupId:String?
+struct IMessage: Codable {
     var from:String
     var event: MessageEvent
     var type: MessageType
     var category: MessageCategoy
     var body: String
 }
+
+struct ChatBody {
+    var groupId:String
+    var ext:String
+}
+

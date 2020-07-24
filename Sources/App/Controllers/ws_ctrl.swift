@@ -27,16 +27,21 @@ func handleWs(req: Request, ws: WebSocket) {
     cacheWs(uid: loginUid, ws: ws)
     
     // Message
-    ws.onText { _, string in
+    ws.onText { _, content in
         logger.info("Cache Ws:\(wsLocalConnCache)")
         
         // Group Reply
         for (_, tmpWs) in wsLocalConnCache {
-            tmpWs.send("GROUP REPLY:\(string)")
+            tmpWs.send("GROUP REPLY:\(content)")
         }
         
         // Single Reply
         // ws.send("Reply:\(string)")
+        do {
+            try dispatchMsg(req: req, msg: content)
+        } catch {
+            logger.error("Find Error:")
+        }
     }
     
     // Ping
@@ -54,8 +59,4 @@ func handleWs(req: Request, ws: WebSocket) {
         logger.info("Close Ws, Remove From Cache")
         removeCacheWs(uid: loginUid)
     }
-}
-
-func handleMsg(msg:String) {
-    
 }
