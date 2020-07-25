@@ -22,7 +22,15 @@ public func dispatchMsg(req: Request, msg: String) throws {
 }
 
 func handleLogin(req: Request, msg: IMessage) {
+    let uid = UUID.init(uuidString: msg.from)
+    logger.info("Check Login:\(uid)")
     // check unsend msg
-    let unsentMsg = MessageStatus.query(on: req.db)
-        .filter(\.$groupId == UUID.init()).all()
+    MessageStatus.query(on: req.db)
+        .filter(\.$revUid == uid!).all { result in
+            let data = try! result.get()
+            logger.info("tttt:\(data)")
+            let ws =  try! getWs(uid: "1")
+            ws.send(data.groupId.uuidString)
+    }
+    
 }

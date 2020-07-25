@@ -26,3 +26,10 @@ func removeCacheWs(uid: String) {
         }
     }
 }
+
+func getWs(uid:String) throws -> WebSocket {
+    guard let ws = wsLocalConnCache[uid] else {
+        throw BizError.IllegalWsConnection
+    }
+    return ws
+}

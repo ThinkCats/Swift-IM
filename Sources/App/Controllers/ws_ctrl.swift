@@ -13,18 +13,21 @@ public func routeWs(app: Application) {
 func handleWs(req: Request, ws: WebSocket) {
     logger.info("Connect Echo:\(ws), Ws Size:\(MemoryLayout.size(ofValue: ws)),Request Header:\(req.headers) ")
     
-    guard let loginUid = req.headers.first(name: "Sec-WebSocket-Protocol") else {
-        logger.info("Not Login")
-        ws.send("Not Login")
-        return
-    }
+//    TODO Check Login
+//    guard let loginUid = req.headers.first(name: "Sec-WebSocket-Protocol") else {
+//        logger.info("Not Login")
+//        ws.send("Not Login")
+//        return
+//    }
     
-    logger.info("Auth Ok:\(loginUid)")
+//    logger.info("Auth Ok:\(loginUid)")
     
     // Send Greeting
     ws.send("Welcome!")
     // Local Cache Connection
-    cacheWs(uid: loginUid, ws: ws)
+    //TODO Save Uid 1
+    let mockLoginUid = "1"
+    cacheWs(uid: mockLoginUid, ws: ws)
     
     // Message
     ws.onText { _, content in
@@ -40,7 +43,7 @@ func handleWs(req: Request, ws: WebSocket) {
         do {
             try dispatchMsg(req: req, msg: content)
         } catch {
-            logger.error("Find Error:")
+            logger.error("Find Error:\(error)")
         }
     }
     
@@ -57,6 +60,6 @@ func handleWs(req: Request, ws: WebSocket) {
     // Close
     ws.onClose.whenComplete { _ in
         logger.info("Close Ws, Remove From Cache")
-        removeCacheWs(uid: loginUid)
+        removeCacheWs(uid: mockLoginUid)
     }
 }

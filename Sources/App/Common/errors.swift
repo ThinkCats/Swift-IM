@@ -8,4 +8,5 @@
 enum BizError: Error {
     case SlackOfParams
     case UnknownMsgEvent
+    case IllegalWsConnection
 }
